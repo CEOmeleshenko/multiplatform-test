@@ -1,34 +1,23 @@
 workflows:
   ios:
     name: Build iOS
-    max_build_duration: 120
     environment:
-      xcode: latest
-    triggering:
-      events:
-        - push
+      vars:
+        XCODE_WORKSPACE: "CodemagicSample.xcworkspace"
+        XCODE_SCHEME: "CodemagicSample"
     scripts:
-      - name: Install dependencies
+      - name: Cocoapods installation
         script: |
           cd $CM_BUILD_DIR/iosApp
           pod install
-      - name: Build iOS
-        script: |
-          ./gradlew :iosApp:syncFramework -Pconfiguration=Release
-      - name: Archive iOS app
-        script: |
-          xcodebuild -workspace iosApp/iosApp.xcworkspace \
-          -scheme iosApp \
-          -sdk iphoneos \
-          -configuration Release \
-          -archivePath $CM_BUILD_DIR/iosApp.xcarchive \
-          clean archive
-      - name: Export IPA
-        script: |
-          xcodebuild -exportArchive \
-          -archivePath $CM_BUILD_DIR/iosApp.xcarchive \
-          -exportOptionsPlist iosApp/ExportOptions.plist \
-          -exportPath $CM_BUILD_DIR
-
+          - name: Set up code signing settings on Xcode project
+            script: |
+              xcode-project use-profiles
+          - name: Build ipa for distribution
+            script: |
+              cd $CM_BUILD_DIR/iosApp
+              xcode-project build-ipa \
+                --workspace "$XCODE_WORKSPACE" \
+                --scheme "$XCODE_SCHEME"
     artifacts:
-      - iosApp/build/ios/ipa/kmmtestapp.ipa
+      - iosApp/build/ios/ipa/*.ipa
