@@ -10,9 +10,8 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
-          brew install cocoapods
-          pod repo update
-          pod install --project-directory=$CM_BUILD_DIR/iosApp
+          cd $CM_BUILD_DIR/iosApp
+          pod install
       - name: Build iOS
         script: |
           ./gradlew :iosApp:syncFramework -Pconfiguration=Release
