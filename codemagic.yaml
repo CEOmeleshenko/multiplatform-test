@@ -16,7 +16,7 @@ workflows:
 
       - name: Build Kotlin Multiplatform framework
         script: |
-          ./gradlew :shared:packForXcode -PXCODE_CONFIGURATION=Release
+          ./gradlew :composeApp:packForXcode -PXCODE_CONFIGURATION=Release
 
       - name: Build .ipa
         script: |
